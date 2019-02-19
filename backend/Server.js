@@ -3,6 +3,10 @@ const googleMapsClient = require('@google/maps').createClient({
   Promise: Promise // 'Promise' is the native constructor.
 });
 
+const Zomato = require('zomato.js');
+const z = new Zomato('4d5b010744c51737ecf7d210fdae90ca');
+
+
 let express = require("express")
 let cors = require("cors")
 let bodyParser = require("body-parser")
@@ -10,20 +14,33 @@ let app = express()
 app.use(cors())
 app.use(bodyParser.raw({ type: "*/*" }))
 
-app.get("/nearby", function(req, res) {
-  console.log("in nearby")
-    let location = {lat: '45.5017156', lng: '-73.5728669'}
-    let radius = 5000
-    console.log("location", location)
-    googleMapsClient.placesNearby({location: location, radius: radius, type: 'restaurant'}).asPromise()
+app.post("/nearbygo", function(req, res) {
+  console.log("in google nearby")
+    let params = JSON.parse(req.body);
+    console.log("params", params)
+    googleMapsClient.placesNearby(params).asPromise()
     .then((response) => {
       let reply = {status: true,
                   restos: response.json.results}
-      //res.send(response.json.results)
-      //res.send(reply)
       res.send(JSON.stringify(reply))
     })
     .catch((err) => {
+      res.send(err)
+    });
+})
+
+app.post("/nearbyzo", function(req, res) {
+  console.log("in zomato nearby")
+    let params = JSON.parse(req.body);
+    console.log("params", params)
+    z.search(params)
+    .then(function(data) {
+      console.log(data);
+      let reply = {status: true,
+                  restos: data.restaurants}
+      res.send(JSON.stringify(reply))
+    })
+    .catch(function(err) {
       res.send(err)
     });
 })

@@ -7,6 +7,8 @@ import App from './App';
 
 let reducer = function(state, action) {
     switch (action.type) {
+      case "set-location":
+        return { ...state, lat: action.lat, lng: action.lng };
       case "set-resto-list":
         return { ...state, restos: action.content };
       default:
@@ -16,7 +18,9 @@ let reducer = function(state, action) {
   
   const myStore = createStore(
     reducer,
-    {restos: []},
+    { lat: '45.5017156',
+      lng: '-73.5728669',
+      restos: []},
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   );
 
