@@ -1,5 +1,29 @@
-.App {
+@import url('https://fonts.googleapis.com/css?family=Bangers');
+
+body{
+  height: 100%; 
+	margin: 0;
+  padding: 0;
   text-align: center;
+}
+
+.App {
+  left:25%;
+  position: absolute;
+  justify-content: center;
+  text-align: center;
+}
+
+.Btn{
+  position: absolute;
+  padding: 15px 30px;
+  font-family: 'Bangers',cursive;
+  font-size: 30px;
+  background-color:#FF0000;
+  border-radius: 25px;
+  font-weight: bold;
+  bottom: 10%;
+  left: 35%;
 }
 
 .App-logo {

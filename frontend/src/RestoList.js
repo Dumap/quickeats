@@ -1,15 +1,33 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import RestoCard from "./RestoCard";
 
 class RestoList extends Component {
   constructor() {
     super();
     this.state = {
-      restos: null
-    };
+      lat: '45.5017156',
+      lng: '-73.5728669',
+    }
+  }
+  getMyLocation = () =>{
+    const location = window.navigator && window.navigator.geolocation
+    
+    if (location) {
+      location.getCurrentPosition((position) => {
+        this.setState({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+      }, (error) => {
+        this.setState({ lat: 'err-latitude', lng: 'err-longitude' })
+      })
+    }
+
   }
   componentDidMount = () => {
-    console.log("in restolist", this.props.cor)
+    this.getMyLocation()
+    console.log("in restolist", this.state)
     // let location = {lat: '45.5017156', lng: '-73.5728669'}
     // let radius = 5000
     // let body = { username, review, rating };
@@ -19,7 +37,11 @@ class RestoList extends Component {
           //console.log(response)
         let parsedResponse = JSON.parse(response);
         if (parsedResponse.status) {
-          this.setState({ restos: parsedResponse.restos });
+          //this.setState({ restos: parsedResponse.restos });
+          this.props.dispatch({
+            type: "set-resto-list",
+            content: parsedResponse.restos
+          });
         }
       })
       .catch(err => console.log("ERROR",err));
@@ -35,12 +57,21 @@ class RestoList extends Component {
   render() {
     return (
       <div>
-        {this.state.restos
-          ? this.state.restos.map(this.renderRestoList)
+        {this.props.restos
+          ? this.props.restos.map(this.renderRestoList)
           : "loading restorants"}
       </div>
     );
   }
 }
 
-export default RestoList;
+let mapStateToProps = function(state) {
+  return {
+    restos: state.restos
+  };
+};
+
+let connectRestoList = connect(mapStateToProps)(RestoList);
+
+export default connectRestoList;
+
