@@ -61,18 +61,4 @@ app.get("/detail", function(req, res) {
     });
 })
 
-app.get("/photo", function(req, res) {
-  console.log("in photo")
-    let photoId = 'CmRaAAAAHdWhFGH3GSm8QtEcj6BiSYcgXxR8AdK5gcgyp6y-HgQu4A4tLPF2XZoD-Ht_qJU8Q820tN2xssxlwAcmmi4tdHOzisU_S8DTA5S8a_BHxQsCCe_jsumHU0T4UmweTtmBEhB82BoKfCMWjV39dvi8Ll9iGhT1I3A2fkUi3YNukAkWyb8L6k3pEg'
-    googleMapsClient.placesPhoto({photoreference: photoId, maxwidth: 400}).asPromise()
-    .then((response) => {
-      res.send(response)
-      console.log("Result:",response.toString())
-    })
-    .catch((err) => {
-      //res.send(err)
-      console.log("Error", err)
-    });
-})
-
 app.listen(4000)

@@ -1,57 +1,64 @@
 @import url('https://fonts.googleapis.com/css?family=Bangers');
 
-body{
-  height: 100%; 
-	margin: 0;
-  padding: 0;
-  text-align: center;
-}
-
-.App {
-  left:25%;
-  position: absolute;
-  justify-content: center;
-  text-align: center;
-}
-
-.Btn{
-  position: absolute;
-  padding: 15px 30px;
-  font-family: 'Bangers',cursive;
-  font-size: 30px;
-  background-color:#FF0000;
-  border-radius: 25px;
-  font-weight: bold;
-  bottom: 10%;
-  left: 35%;
-}
-
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 40vmin;
-  pointer-events: none;
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.App{
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+}
+ .card {
+  /* Add shadows to create the "card" effect */
+  background: #f4f5f7;
+  max-width: 75%;
+  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+  transition: 0.3s;
+  border-radius: 5px; /* 5px rounded corners */
 }
 
-.App-link {
-  color: #61dafb;
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+/* Add some padding inside the card container */
+.container {
+  padding: 2px 16px;
+} 
+
+/* Extra small devices (phones, 600px and down) */
+@media only screen and (max-width: 600px) {
+  .card {
+    max-width: 90%;
   }
-  to {
-    transform: rotate(360deg);
+} 
+
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+  .card {
+    max-width: 75%;
   }
+
+} 
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+  .card {
+    max-width: 70%;
+  }
+} 
+
+/* Large devices (laptops/desktops, 992px and up) */
+@media only screen and (min-width: 992px) {
+  .card {
+    max-width: 50%;
+  }
+
+} 
+
+/* Extra large devices (large laptops and desktops, 1200px and up) */
+@media only screen and (min-width: 1200px) {
+  .card {
+    max-width: 40%;
+  }
+
 }
+

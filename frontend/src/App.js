@@ -5,6 +5,7 @@ import './App.css';
 import RestoListGo from "./RestoListGo";
 import RestoListZo from "./RestoListZo";
 import StartBtns from './StartBtns';
+import NavAppBar from './NavAppBar';
 
 class App extends Component {
 
@@ -44,10 +45,13 @@ class App extends Component {
   render() {
     return (
       <BrowserRouter>
-        <div className="App">
-        <Route exact={true} path="/" render={this.renderStartButtons} />
-        <Route exact={true} path="/golist" render={this.renderRestosGo} />
-        <Route exact={true} path="/zolist" render={this.renderRestosZo} />
+        <div>
+          <NavAppBar />
+          <div className="App">
+            <Route exact={true} path="/" render={this.renderStartButtons} />
+            <Route exact={true} path="/golist" render={this.renderRestosGo} />
+            <Route exact={true} path="/zolist" render={this.renderRestosZo} />
+          </div>
         </div>
       </BrowserRouter>
     );

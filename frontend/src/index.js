@@ -8,6 +8,8 @@ import App from './App';
 let reducer = function(state, action) {
     switch (action.type) {
       case "set-location":
+        localStorage.setItem('lat', action.lat);
+        localStorage.setItem('lng', action.lng);
         return { ...state, lat: action.lat, lng: action.lng };
       case "set-resto-list":
         return { ...state, restos: action.content };
@@ -15,12 +17,16 @@ let reducer = function(state, action) {
         return state;
     }
   };
+
+  const initialState = {
+    lat: localStorage.getItem('lat'),
+    lng: localStorage.getItem('lng'),
+    restos: []
+  };
   
   const myStore = createStore(
     reducer,
-    { lat: '45.5017156',
-      lng: '-73.5728669',
-      restos: []},
+    initialState,
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   );
 
