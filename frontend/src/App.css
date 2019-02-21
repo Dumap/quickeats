@@ -114,6 +114,10 @@
   border-radius: 5px 0 0 5px;    
 }
 
+.title {
+  color: #FFFFFF;
+}
+
 
 /* Extra small devices (phones, 600px and down) */
 @media only screen and (max-width: 600px) {

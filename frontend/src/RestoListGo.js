@@ -60,7 +60,15 @@ const styles = theme => ({
   avatar: {
     backgroundColor: red[500],
   },
+  dark: {
+    backgroundColor: "#191d20",
+  },
+  margin: {
+    margin: theme.spacing.unit,
+  },
 });
+
+const Title = ({ children }) => <div class="title">{children}</div>;
 
 class RestoListGo extends Component {
   state = { expanded: false,
@@ -235,12 +243,17 @@ class RestoListGo extends Component {
           onClose={this.handleClose}
           aria-labelledby="responsive-dialog-title"
           >
-          <DialogTitle id="responsive-dialog-title">{"How to get there"}</DialogTitle>
+          <DialogTitle className={this.props.classes.dark} id="responsive-dialog-title"><Title>{"How do you get there"}</Title></DialogTitle>
           <DialogContent>
+            <br />
             <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lat}/>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.handleClose} color="primary" autoFocus>
+            <Button 
+              size="large" 
+              className={this.props.classes.margin}
+              onClick={this.handleClose} 
+              autoFocus>
               Close
             </Button>
           </DialogActions>

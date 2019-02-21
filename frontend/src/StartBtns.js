@@ -52,12 +52,12 @@ class StartBtns extends Component {
         <img className={this.props.classes.sslogopic} src="logo.png" alt="Quickest" />
         <img className={this.props.classes.sslogotxt} src="qelogo.png" alt="Quickest" />
         <button 
-            class="filterbutton" 
+            className="filterbutton" 
             onClick={this.goToFilter}
             >Set filters
        </button>
         <button 
-            class="defautlebutton"  
+            className="defautlebutton"  
             onClick={this.goToList}
             >Use defaults
         </button>

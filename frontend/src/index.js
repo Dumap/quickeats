@@ -12,6 +12,7 @@ let reducer = function(state, action) {
         localStorage.setItem('lng', action.lng);
         return { ...state, lat: action.lat, lng: action.lng };
       case "set-resto-list":
+        localStorage.setItem('restos', JSON.stringify(action.content));
         return { ...state, restos: action.content };
       case "set-search-flg":
         return { ...state, newSearch: action.content };
@@ -20,11 +21,21 @@ let reducer = function(state, action) {
     }
   };
 
+  function IsJsonString(str) {
+    try {
+        let tmp = JSON.parse(str);
+        console.log("It's JSON", tmp)
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
   const initialState = {
     lat: localStorage.getItem('lat'),
     lng: localStorage.getItem('lng'),
     newSearch: false,
-    restos: []
+    restos: IsJsonString(localStorage.getItem('restos')) ? JSON.parse(localStorage.getItem('restos')) : []
   };
   
   const myStore = createStore(

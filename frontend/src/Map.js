@@ -13,7 +13,7 @@ class Map extends Component {
             googleMapURL: "https://maps.googleapis.com/maps/api/js", 
             loadingElement: <div style={{ height: `400px` }} />,
             containerElement: <div style={{ width: `100%` }} />,
-            mapElement: <div style={{height: `400px`, width: `400px` }}  />,
+            mapElement: <div style={{height: `400px`, width: `100%` }}  />,
           }),
           withScriptjs,
           withGoogleMap,

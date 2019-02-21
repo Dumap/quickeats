@@ -29,7 +29,7 @@ class App extends Component {
   }
   renderRestosGo = () => {
     console.log("in renderRestosGo")
-    return <RestoListGo />;
+      return <RestoListGo />;
   }
   renderFilter = () => {
     console.log("in renderFilter")
