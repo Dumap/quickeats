@@ -12,6 +12,7 @@ import CardActions from '@material-ui/core/CardActions';
 import Collapse from '@material-ui/core/Collapse';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
+import Button from "@material-ui/core/Button";
 import Typography from '@material-ui/core/Typography';
 import red from '@material-ui/core/colors/red';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -19,6 +20,14 @@ import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import StarRatings from 'react-star-ratings';
+import Reviews from './Reviews';
+import Map from './Map';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import withMobileDialog from '@material-ui/core/withMobileDialog';
+import { compose } from "recompose";
 
 
 const styles = theme => ({
@@ -54,9 +63,11 @@ const styles = theme => ({
 });
 
 
+
 class RestoListGo extends Component {
   state = { expanded: false,
-            index: 0 };
+            index: 0,
+            open: false };
 
   handleExpandClick = () => {
     this.setState(state => ({ expanded: !state.expanded }));
@@ -66,6 +77,14 @@ class RestoListGo extends Component {
     this.setState({
       index: value,
     });
+  };
+
+  handleOpen = () => {
+    this.setState({ open: true });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
   };
 
   handleChangeIndex = index => {
@@ -114,7 +133,7 @@ class RestoListGo extends Component {
       body: JSON.stringify(body)
     }).then(response => response.text())
       .then(response => {
-          //console.log(response)
+          console.log(response)
         let parsedResponse = JSON.parse(response);
         if (parsedResponse.status) {
           //this.setState({ restos: parsedResponse.restos });
@@ -127,6 +146,7 @@ class RestoListGo extends Component {
       .catch(err => console.log("ERROR",err));
   };
   renderRestoList = (resto, index) => {
+    console.log("Resto name", resto.name)
     return (
       <div key={resto.id} style={Object.assign({}, styles.slide, styles)}> 
         <Card className={this.props.classes.card}>
@@ -136,7 +156,6 @@ class RestoListGo extends Component {
                 aria-label="Restaurant" 
                 src={resto.icon}
                 className={this.props.classes.avatar} />
-
             }
             action={
               <IconButton>
@@ -182,6 +201,13 @@ class RestoListGo extends Component {
             onClick={this.goForwardClick}>
             <ArrowForwardIcon />
           </IconButton>
+          <IconButton aria-label="Map" onClick={this.handleOpen}>
+            <Avatar 
+                  aria-label="Map" 
+                  src="https://www.topview.co.nz/wp-content/uploads/2015/01/google-maps-round-shadow-300x300.png"
+                  className={this.props.classes.bigAvatar}
+             />
+          </IconButton>
           <IconButton
             className={classnames(this.props.classes.expand, {
               [this.props.classes.expandOpen]: this.state.expanded,
@@ -194,38 +220,31 @@ class RestoListGo extends Component {
           </IconButton>
         </CardActions>
         <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
-          <CardContent>
-            <Typography paragraph>Method:</Typography>
-            <Typography paragraph>
-              Heat 1/2 cup of the broth in a pot until simmering, add saffron and set aside for 10
-              minutes.
-            </Typography>
-            <Typography paragraph>
-              Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over medium-high
-              heat. Add chicken, shrimp and chorizo, and cook, stirring occasionally until lightly
-              browned, 6 to 8 minutes. Transfer shrimp to a large plate and set aside, leaving
-              chicken and chorizo in the pan. Add pimentón, bay leaves, garlic, tomatoes, onion,
-              salt and pepper, and cook, stirring often until thickened and fragrant, about 10
-              minutes. Add saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
-            </Typography>
-            <Typography paragraph>
-              Add rice and stir very gently to distribute. Top with artichokes and peppers, and cook
-              without stirring, until most of the liquid is absorbed, 15 to 18 minutes. Reduce heat
-              to medium-low, add reserved shrimp and mussels, tucking them down into the rice, and
-              cook again without stirring, until mussels have opened and rice is just tender, 5 to 7
-              minutes more. (Discard any mussels that don’t open.)
-            </Typography>
-            <Typography>
-              Set aside off of the heat to let rest for 10 minutes, and then serve.
-            </Typography>
-          </CardContent>
+          <Reviews id={resto.place_id}/>
         </Collapse>
         </Card>
+        <Dialog
+          fullScreen={this.props.fullScreen}
+          open={this.state.open}
+          onClose={this.handleClose}
+          aria-labelledby="responsive-dialog-title"
+          >
+          <DialogTitle id="responsive-dialog-title">{"How to get there"}</DialogTitle>
+          <DialogContent>
+            <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lat}/>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.handleClose} color="primary" autoFocus>
+              Close
+            </Button>
+          </DialogActions>
+        </Dialog>
       </div>
     );
   };
   render() {
     const { index } = this.state;
+    console.log("Hello")
     return (
       <div className="card">
         <SwipeableViews index={index} onChangeIndex={this.handleChangeIndex}>
@@ -247,11 +266,11 @@ let mapStateToProps = function(state) {
 };
 
 RestoListGo.propTypes = {
+  fullScreen: PropTypes.bool.isRequired,
   classes: PropTypes.object.isRequired,
 };
 
-
 let connectRestoListGo = connect(mapStateToProps)(RestoListGo);
 
-export default  withStyles(styles)(connectRestoListGo);
+export default  compose(withStyles(styles))(withMobileDialog()(connectRestoListGo));
 

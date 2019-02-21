@@ -5,13 +5,17 @@
   "dependencies": {
     "@material-ui/core": "^3.9.2",
     "@material-ui/icons": "^3.0.2",
+    "compose": "^0.1.2",
     "react": "^16.8.2",
+    "react-compose": "^2.0.0",
     "react-dom": "^16.8.2",
+    "react-google-maps": "^9.4.5",
     "react-redux": "^6.0.0",
     "react-router-dom": "^4.3.1",
     "react-scripts": "2.1.5",
     "react-star-ratings": "^2.3.0",
     "react-swipeable-views": "^0.13.1",
+    "recompose": "^0.30.0",
     "redux": "^4.0.1"
   },
   "scripts": {

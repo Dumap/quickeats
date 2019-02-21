@@ -1,5 +1,6 @@
 const googleMapsClient = require('@google/maps').createClient({
   key: 'AIzaSyBY89bOyBuSZnSkDdebZwUCFFw3jL2gcEI',  // server key
+  rate: {limit: 50},
   Promise: Promise // 'Promise' is the native constructor.
 });
 
@@ -20,11 +21,13 @@ app.post("/nearbygo", function(req, res) {
     console.log("params", params)
     googleMapsClient.placesNearby(params).asPromise()
     .then((response) => {
+      console.log("results", response.json.results)
       let reply = {status: true,
                   restos: response.json.results}
       res.send(JSON.stringify(reply))
     })
     .catch((err) => {
+      console.log("err", err)
       res.send(err)
     });
 })
@@ -45,15 +48,17 @@ app.post("/nearbyzo", function(req, res) {
     });
 })
 
-app.get("/detail", function(req, res) {
+app.post("/detail", function(req, res) {
   console.log("in detail")
-    let placeId = 'ChIJlfjVd0IayUwRi8rjxbMESlI'
-    console.log("Place ID:", placeId)
-    googleMapsClient.place({placeid: placeId}).asPromise()
+    let params = JSON.parse(req.body);
+    console.log("Place ID:", params)
+    googleMapsClient.place(params).asPromise()
     .then((response) => {
       //res.send(response.json.result)
-      res.send(JSON.stringify(response))
       console.log("Result:",response.json.result)
+      let reply = {status: true,
+          reviews: response.json.result.reviews}
+      res.send(JSON.stringify(reply))
     })
     .catch((err) => {
       res.send(err)
