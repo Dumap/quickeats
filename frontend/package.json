@@ -6,6 +6,7 @@
     "@material-ui/core": "^3.9.2",
     "@material-ui/icons": "^3.0.2",
     "compose": "^0.1.2",
+    "lodash": "^4.17.11",
     "react": "^16.8.2",
     "react-compose": "^2.0.0",
     "react-dom": "^16.8.2",

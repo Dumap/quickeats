@@ -13,6 +13,8 @@ let reducer = function(state, action) {
         return { ...state, lat: action.lat, lng: action.lng };
       case "set-resto-list":
         return { ...state, restos: action.content };
+      case "set-search-flg":
+        return { ...state, newSearch: action.content };
       default:
         return state;
     }
@@ -21,6 +23,7 @@ let reducer = function(state, action) {
   const initialState = {
     lat: localStorage.getItem('lat'),
     lng: localStorage.getItem('lng'),
+    newSearch: false,
     restos: []
   };
   

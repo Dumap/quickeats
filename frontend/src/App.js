@@ -3,7 +3,7 @@ import { BrowserRouter, Route } from "react-router-dom";
 import { connect } from "react-redux";
 import './App.css';
 import RestoListGo from "./RestoListGo";
-import RestoListZo from "./RestoListZo";
+import Filter from "./Filter";
 import StartBtns from './StartBtns';
 import NavAppBar from './NavAppBar';
 
@@ -31,9 +31,9 @@ class App extends Component {
     console.log("in renderRestosGo")
     return <RestoListGo />;
   }
-  renderRestosZo = () => {
-    console.log("in renderRestosZo")
-    return <RestoListZo />;
+  renderFilter = () => {
+    console.log("in renderFilter")
+    return <Filter />;
   }
   renderStartButtons = () => {
     console.log("in renderStartButtons")
@@ -47,12 +47,12 @@ class App extends Component {
       <BrowserRouter>
         <div>
           <NavAppBar />
-          <div className="App">
-            <Route exact={true} path="/" render={this.renderStartButtons} />
-            <Route exact={true} path="/golist" render={this.renderRestosGo} />
-            <Route exact={true} path="/zolist" render={this.renderRestosZo} />
+            <div className="App">
+              <Route exact={true} path="/" render={this.renderStartButtons} />
+              <Route exact={true} path="/golist" render={this.renderRestosGo} />
+              <Route exact={true} path="/filter" render={this.renderFilter} />
+            </div>
           </div>
-        </div>
       </BrowserRouter>
     );
   }
@@ -62,6 +62,7 @@ let mapStateToProps = function(state) {
   return {
     lat: state.lat,
     lng: state.lng,
+    newSearch: state.newSearch,
     restos: state.restos
   };
 };

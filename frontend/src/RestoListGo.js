@@ -62,8 +62,6 @@ const styles = theme => ({
   },
 });
 
-
-
 class RestoListGo extends Component {
   state = { expanded: false,
             index: 0,
@@ -113,37 +111,45 @@ class RestoListGo extends Component {
 
   priceSymbols = (level) => {
     let pricelevel = "$";
-    if ( level === 1 ) {
-      return pricelevel;
+    if( level > 0){
+      if ( level === 1 ) {
+        return pricelevel;
+      }
+      return pricelevel + this.priceSymbols( level - 1 );
     }
-    return pricelevel + this.priceSymbols( level - 1 );
   }
   componentDidMount = () => {
-    console.log("in restolist")
-    console.log("latitude", this.props.lat)
-    console.log("latitude", this.props.lng)
-    let locArray = [this.props.lat, this.props.lng];
-    let body = { location: locArray,
-                  radius: 1000,
-                  type: 'restaurant',
-                  rankby: 'prominence' 
-                }
-    fetch("/nearbygo", {
-      method: "POST",
-      body: JSON.stringify(body)
-    }).then(response => response.text())
-      .then(response => {
-          console.log(response)
-        let parsedResponse = JSON.parse(response);
-        if (parsedResponse.status) {
-          //this.setState({ restos: parsedResponse.restos });
-          this.props.dispatch({
-            type: "set-resto-list",
-            content: parsedResponse.restos
-          });
-        }
-      })
-      .catch(err => console.log("ERROR",err));
+    if(this.props.newSearch){
+      console.log("in restolist")
+      console.log("latitude", this.props.lat)
+      console.log("latitude", this.props.lng)
+      let locArray = [this.props.lat, this.props.lng];
+      let body = { location: locArray,
+                    radius: 1000,
+                    type: 'restaurant',
+                    rankby: 'prominence' 
+                  }
+      fetch("/nearbygo", {
+        method: "POST",
+        body: JSON.stringify(body)
+      }).then(response => response.text())
+        .then(response => {
+            console.log(response)
+          let parsedResponse = JSON.parse(response);
+          if (parsedResponse.status) {
+            //this.setState({ restos: parsedResponse.restos });
+            this.props.dispatch({
+              type: "set-resto-list",
+              content: parsedResponse.restos
+            });
+            this.props.dispatch({
+              type: "set-search-flg",
+              content: false
+            });
+          }
+        })
+        .catch(err => console.log("ERROR",err));
+    }
   };
   renderRestoList = (resto, index) => {
     console.log("Resto name", resto.name)
@@ -163,7 +169,7 @@ class RestoListGo extends Component {
               </IconButton>
             }
             title={resto.name} 
-            subheader={resto.opening_hours.open_now ? "Open Now" : "Closed"}
+            subheader={resto.hasOwnProperty("opening_hours") ? resto.opening_hours.open_now ? "Open Now" : "Closed" : ""}
           />
 
           <CardMedia
@@ -204,7 +210,7 @@ class RestoListGo extends Component {
           <IconButton aria-label="Map" onClick={this.handleOpen}>
             <Avatar 
                   aria-label="Map" 
-                  src="https://www.topview.co.nz/wp-content/uploads/2015/01/google-maps-round-shadow-300x300.png"
+                  src="google-maps.png"
                   className={this.props.classes.bigAvatar}
              />
           </IconButton>
@@ -261,6 +267,7 @@ let mapStateToProps = function(state) {
   return {
     lat: state.lat,
     lng: state.lng,
+    newSearch: state.newSearch,
     restos: state.restos
   };
 };

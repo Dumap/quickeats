@@ -4,10 +4,6 @@ const googleMapsClient = require('@google/maps').createClient({
   Promise: Promise // 'Promise' is the native constructor.
 });
 
-const Zomato = require('zomato.js');
-const z = new Zomato('4d5b010744c51737ecf7d210fdae90ca');
-
-
 let express = require("express")
 let cors = require("cors")
 let bodyParser = require("body-parser")
@@ -28,22 +24,6 @@ app.post("/nearbygo", function(req, res) {
     })
     .catch((err) => {
       console.log("err", err)
-      res.send(err)
-    });
-})
-
-app.post("/nearbyzo", function(req, res) {
-  console.log("in zomato nearby")
-    let params = JSON.parse(req.body);
-    console.log("params", params)
-    z.search(params)
-    .then(function(data) {
-      console.log(data);
-      let reply = {status: true,
-                  restos: data.restaurants}
-      res.send(JSON.stringify(reply))
-    })
-    .catch(function(err) {
       res.send(err)
     });
 })
