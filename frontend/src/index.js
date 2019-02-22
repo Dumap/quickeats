@@ -16,6 +16,16 @@ let reducer = function(state, action) {
         return { ...state, restos: action.content };
       case "set-search-flg":
         return { ...state, newSearch: action.content };
+      case "set-prefs":
+        return { ...state, prefs: action.content };
+      case "clear-prefs":
+        let defaultPrefs = {
+          radius: '1000',
+          maxprice: '4',
+          rankby: 'prominence',
+          keyword: ''
+        }
+        return { ...state, prefs: defaultPrefs };
       default:
         return state;
     }
@@ -35,6 +45,12 @@ let reducer = function(state, action) {
     lat: localStorage.getItem('lat'),
     lng: localStorage.getItem('lng'),
     newSearch: false,
+    prefs: {
+      radius: 1000,
+      maxprice: 4,
+      rankby: 'prominence',
+      keyword: ''
+    },
     restos: IsJsonString(localStorage.getItem('restos')) ? JSON.parse(localStorage.getItem('restos')) : []
   };
   

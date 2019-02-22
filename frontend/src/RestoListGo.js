@@ -24,6 +24,7 @@ import Reviews from './Reviews';
 import Map from './Map';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import withMobileDialog from '@material-ui/core/withMobileDialog';
@@ -68,7 +69,7 @@ const styles = theme => ({
   },
 });
 
-const Title = ({ children }) => <div class="title">{children}</div>;
+const Title = ({ children }) => <div className="title">{children}</div>;
 
 class RestoListGo extends Component {
   state = { expanded: false,
@@ -129,14 +130,15 @@ class RestoListGo extends Component {
   componentDidMount = () => {
     if(this.props.newSearch){
       console.log("in restolist")
-      console.log("latitude", this.props.lat)
-      console.log("latitude", this.props.lng)
       let locArray = [this.props.lat, this.props.lng];
       let body = { location: locArray,
-                    radius: 1000,
+                    radius: this.props.prefs.radius,
                     type: 'restaurant',
-                    rankby: 'prominence' 
+                    maxprice: this.props.prefs.price,
+                    rankby: this.props.prefs.rankby, 
+                    keyword: this.props.prefs.keyword
                   }
+      console.log("search", body)
       fetch("/nearbygo", {
         method: "POST",
         body: JSON.stringify(body)
@@ -153,6 +155,9 @@ class RestoListGo extends Component {
             this.props.dispatch({
               type: "set-search-flg",
               content: false
+            });
+            this.props.dispatch({
+              type: "clear-prefs"
             });
           }
         })
@@ -246,7 +251,12 @@ class RestoListGo extends Component {
           <DialogTitle className={this.props.classes.dark} id="responsive-dialog-title"><Title>{"How do you get there"}</Title></DialogTitle>
           <DialogContent>
             <br />
-            <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lat}/>
+            <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lng}/>
+            <br />
+            <DialogContentText>Destination: <br /><br />
+                              <b>{resto.name}</b><br />
+                              {resto.vicinity}
+            </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button 
@@ -281,6 +291,7 @@ let mapStateToProps = function(state) {
     lat: state.lat,
     lng: state.lng,
     newSearch: state.newSearch,
+    prefs: state.prefs,
     restos: state.restos
   };
 };

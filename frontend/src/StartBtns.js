@@ -35,6 +35,10 @@ const styles = {
 class StartBtns extends Component {
 
   goToFilter = () => {
+    this.props.dispatch({
+      type: "set-search-flg",
+      content: true
+    });
     this.props.history.push("/filter")
   }
 

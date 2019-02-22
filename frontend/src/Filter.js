@@ -7,14 +7,11 @@ import { compose } from "recompose";
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import FormControl from '@material-ui/core/FormControl';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import Select from '@material-ui/core/Select';
-import Radio from '@material-ui/core/Radio';
-import RadioGroup from '@material-ui/core/RadioGroup';
 import FormLabel from '@material-ui/core/FormLabel';
 
 
@@ -51,9 +48,12 @@ const styles = theme => ({
     },
     group: {
         display: 'flex', 
-        flexDirection: 'row'
+        flexDirection: 'row',
+        alignItems: 'flex-start'
     },
     member: {
+        color: 'grey',
+        marginLeft: 20,
         width: 'auto' 
     },
     label: {
@@ -64,14 +64,38 @@ const styles = theme => ({
 
 class Filter extends Component {
     state = {
-        radius: '',
-        maxprice: '',
-        rankby: '',
-        opennow: false,
+        radius: 1000,
+        maxprice: 4,
+        rankby: 'prominence',
         keyword: ''
       };
     handleChange = name => event => {
+        console.log("Event value", event.target.value)
         this.setState({ [name]: event.target.value });
+      };
+
+    handleOptionChange = (event) => {
+        console.log("Option Event value", event.target.value)
+        this.setState({
+            rankby: event.target.value
+        });
+      }
+
+    handleSubmit = (event) => {
+        event.preventDefault();
+        console.log("handling submit")
+        let newPrefs = {
+            radius: this.state.radius,
+            maxprice: this.state.maxprice,
+            rankby: this.state.rankby,
+            keyword: this.state.keyword
+          }
+          this.props.dispatch({
+            type: "set-prefs",
+            content: newPrefs
+          });
+        console.log("newPrefs", newPrefs)
+        this.props.history.push("/golist")
       };
     render() {
         return (
@@ -81,15 +105,15 @@ class Filter extends Component {
                 <Typography component="h1" variant="h5">
                   Search Filters
                 </Typography>
-                <form className={this.props.classes.form}>
+                <form className={this.props.classes.form} onSubmit={this.handleSubmit}>
                 <FormControl className={this.props.classes.formControl}>
                     <InputLabel>Range</InputLabel>
                     <Select
                         native
-                        value={this.state.range}
-                            onChange={this.handleChange('range')}
+                        value={this.state.radius}
+                            onChange={this.handleChange('radius')}
                             inputProps={{
-                            name: 'range'
+                            name: 'radius'
                         }}
                     >
                         <option value="" />
@@ -104,10 +128,10 @@ class Filter extends Component {
                     <Select
                         native
                         autoWidth
-                        value={this.state.price}
-                            onChange={this.handleChange('price')}
+                        value={this.state.maxprice}
+                            onChange={this.handleChange('maxprice')}
                             inputProps={{
-                            name: 'price',
+                            name: 'maxprice',
                         }}
                     >
                         <option value="" />
@@ -116,35 +140,34 @@ class Filter extends Component {
                         <option value={3}>$$$</option>
                         <option value={4}>$$$$</option>
                     </Select>
-                </FormControl>
+                </FormControl >
                     <FormLabel component="legend" 
                                 className={this.props.classes.label}
                         >Rank by</FormLabel>
-                    <RadioGroup
-                        aria-label="rank"
-                        name="rank"
-                        className={this.props.classes.group}
-                        value={this.state.rankby}
-                        onChange={this.handleChange}
-                        >
-                        <FormControlLabel
-                            value="prominence"
-                            className={this.props.classes.member}
-                            control={<Radio color="primary" />}
-                            label="Prominence"
-                            labelPlacement="start"
-                        />
-                        <FormControlLabel
-                            value="distance"
-                            className={this.props.classes.member}
-                            control={<Radio color="primary" />}
-                            label="Distance"
-                            labelPlacement="start"
-                        />
-                    </RadioGroup>
+                        <div className={this.props.classes.group}>
+                            <div className={this.props.classes.member}>
+                            <label>
+                                <input type="radio" value="prominence" 
+                                            checked={this.state.rankby === 'prominence'} 
+                                            onChange={this.handleOptionChange} />
+                                Prominence
+                            </label>
+                            </div>
+                            <div className={this.props.classes.member}>
+                            <label>
+                                <input type="radio" value="distance" 
+                                            checked={this.state.rankby === 'distance'} 
+                                            onChange={this.handleOptionChange} />
+                                Distance
+                            </label>
+                            </div>
+                        </div>
                     <FormControl margin="normal" className={this.props.classes.label} fullWidth>
                         <InputLabel htmlFor="keyword">Key Word</InputLabel>
-                        <Input id="keyword" name="keyword" />
+                        <Input id="keyword" 
+                                name="keyword" 
+                                value={this.state.search}
+                                onChange={this.handleChange('keyword')}/>
                     </FormControl>
                     <br /><br />
                   <Button
