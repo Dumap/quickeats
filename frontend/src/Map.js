@@ -5,6 +5,9 @@ import  { compose, withProps, lifecycle } from 'recompose'
 import { connect } from "react-redux";
 import {withScriptjs, withGoogleMap, GoogleMap, DirectionsRenderer} from 'react-google-maps'
 
+//const apiKey = process.env.API_KEY
+const apiKey = "AIzaSyAG8-zlUDe9RBGIPhO6BErIzH7qznXFkg8"
+
 class Map extends Component {
   
       render() {
@@ -12,7 +15,7 @@ class Map extends Component {
         console.log("dest cors 1:", this.props.rlat + " - " + this.props.rlng)
         const DirectionsComponent = compose(
           withProps({
-            googleMapURL: "https://maps.googleapis.com/maps/api/js?key=AIzaSyAG8-zlUDe9RBGIPhO6BErIzH7qznXFkg8", 
+            googleMapURL: `https://maps.googleapis.com/maps/api/js?key=${apiKey}`, 
             loadingElement: <div style={{ height: `400px` }} />,
             containerElement: <div style={{ width: `100%` }} />,
             mapElement: <div style={{height: `400px`, width: `100%` }}  />,

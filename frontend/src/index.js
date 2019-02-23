@@ -5,6 +5,8 @@ import { createStore } from "redux";
 import './index.css';
 import App from './App';
 
+require('dotenv').config()
+
 let reducer = function(state, action) {
     switch (action.type) {
       case "set-location":

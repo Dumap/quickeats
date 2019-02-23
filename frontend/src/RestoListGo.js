@@ -30,6 +30,9 @@ import Tooltip from '@material-ui/core/Tooltip';
 import withMobileDialog from '@material-ui/core/withMobileDialog';
 import { compose } from "recompose";
 
+//const apiKey = process.env.REACT_APP_API_KEY
+const apiKey = "AIzaSyAG8-zlUDe9RBGIPhO6BErIzH7qznXFkg8"
+console.log("API KEY", apiKey)
 
 const styles = theme => ({
   slide: {
@@ -137,6 +140,22 @@ class RestoListGo extends Component {
       }
       return pricelevel + this.priceSymbols( level - 1 );
     }
+  }
+
+  rad = (x) =>{
+    return x * Math.PI / 180;
+  }
+
+  getDistance = (p1, p2) => {
+    var R = 6378137; // Earth’s mean radius in meter
+    var dLat = this.rad(p2.lat - p1.lat);
+    var dLong = this.rad(p2.lng - p1.lng);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(this.rad(p1.lat)) * Math.cos(this.rad(p2.lat)) *
+      Math.sin(dLong / 2) * Math.sin(dLong / 2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var d = R * c;
+    return d; // returns the distance in meter
   }
 
   componentDidMount = () => {
@@ -262,15 +281,18 @@ class RestoListGo extends Component {
       }
       .bind(this),
       5000)
-    return <img src="food.gif" alt="Loading" width="380" />  
+    return <img src="food.gif" alt="Loading" width="360" />  
   }
 
   renderRestoList = (resto, index) => {
     console.log("resto", resto)
     console.log("resto name", resto.name)
+    let p1 =  { lat: parseInt(this.props.lat), lng: parseInt(this.props.lng)}
+    let p2 =  { lat: parseInt(resto.geometry.location.lat), lng: parseInt(resto.geometry.location.lng)}
+    let distance = this.getDistance(p1, p2)
     let imgSrc;
     if(resto.photos){
-      imgSrc = `https://maps.googleapis.com/maps/api/place/photo?photoreference=${resto.photos[0].photo_reference}&sensor=false&maxheight=1600&maxwidth=1600&key=AIzaSyBY89bOyBuSZnSkDdebZwUCFFw3jL2gcEI`
+      imgSrc = `https://maps.googleapis.com/maps/api/place/photo?photoreference=${resto.photos[0].photo_reference}&sensor=false&maxheight=1600&maxwidth=1600&key=${apiKey}`
     }else{
       imgSrc = "logo-small.png"
     }
@@ -293,7 +315,7 @@ class RestoListGo extends Component {
                 title={resto.name}
             />
           <CardContent>
-          <Typography variant="h5" component="h2">
+            <Typography variant="h5" component="h2">
               {resto.name} 
             </Typography>
             <Typography className={this.props.classes.title} color="textSecondary" gutterBottom>
@@ -365,9 +387,17 @@ class RestoListGo extends Component {
             <br />
             {this.state.openedIndex !== index ? "Not available" : <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lng}/>}
             <br />
-            <DialogContentText><b>{resto.name}</b><br />
-                              {resto.formatted_address}<br />
-                              {resto.formatted_phone_number}
+            <DialogContentText>
+            <Typography variant="h5" component="h2">
+              {resto.name} 
+            </Typography>
+            <Typography className={this.props.classes.title} color="textSecondary" gutterBottom>
+              {resto.formatted_address}<br />
+              {resto.formatted_phone_number}
+            </Typography>
+            <Typography className={this.props.classes.title} color="textSecondary" gutterBottom>
+              Distance: {distance} meters
+            </Typography>
             </DialogContentText>
           </DialogContent>
           <DialogActions>
