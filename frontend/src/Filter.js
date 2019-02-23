@@ -128,7 +128,7 @@ class Filter extends Component {
                     </Select>
                 </FormControl>
                 <FormControl margin="normal" className={this.props.classes.formControl}>
-                    <InputLabel >Price</InputLabel>
+                    <InputLabel >Price limit</InputLabel>
                     <Select
                         native
                         autoWidth
@@ -162,7 +162,7 @@ class Filter extends Component {
                                 <input type="radio" value="distance" 
                                             checked={this.state.rankby === 'distance'} 
                                             onChange={this.handleOptionChange} />
-                                Distance
+                                Distance (50 km range)
                             </label>
                             </div>
                         </div>

@@ -9,6 +9,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import Drawer from '@material-ui/core/Drawer';
 import List from '@material-ui/core/List';
+import ListSubheader from '@material-ui/core/ListSubheader';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
@@ -39,6 +40,10 @@ const styles = {
   fullList: {
     width: 'auto',
   },
+  subhead: {
+    backgroundColor: "#191d20",
+    color: '#FFF'
+  }
 };
 
 class NavAppBar extends Component {
@@ -70,6 +75,7 @@ class NavAppBar extends Component {
     const sideList = (
       <div className={classes.list}>
         <List>
+        <ListSubheader className={classes.subhead} component="div">Menu</ListSubheader>
           {['Home', 'Filter'].map((text, index) => (
             <ListItem 
               button key={text}

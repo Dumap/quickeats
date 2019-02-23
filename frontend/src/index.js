@@ -14,9 +14,6 @@ let reducer = function(state, action) {
       case "clear-resto-list":
       localStorage.removeItem('restos');
         return { ...state, restos: [] };
-      case "add-resto-list":
-        //localStorage.setItem('restos', JSON.stringify(state.restos.concat(action.content)));
-        return { ...state, restos: state.restos.concat(action.content) };
       case "set-resto-list":
         localStorage.setItem('restos', JSON.stringify(action.content));
         return { ...state, restos: action.content };
@@ -26,8 +23,8 @@ let reducer = function(state, action) {
         return { ...state, prefs: action.content };
       case "clear-prefs":
         let defaultPrefs = {
-          radius: '1000',
-          maxprice: '4',
+          radius: 1000,
+          maxprice: 4,
           rankby: 'prominence',
           keyword: ''
         }

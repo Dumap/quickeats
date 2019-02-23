@@ -66,7 +66,7 @@ const styles = theme => ({
   },
   margin: {
     margin: theme.spacing.unit,
-  },
+  }
 });
 
 const Title = ({ children }) => <div className="title">{children}</div>;
@@ -76,7 +76,8 @@ class RestoListGo extends Component {
             index: 0,
             openedIndex: -1,
             open: false,
-            loaded: false
+            loaded: false,
+            noresults: false
           };
 
   handleExpandClick = () => {
@@ -133,17 +134,20 @@ class RestoListGo extends Component {
 
   componentDidMount = () => {
     console.log("Is this a new search?", this.props.newSearch)
-    let restoList = []
     if(this.props.newSearch){
       console.log("in componentDidMount")
       let locArray = [this.props.lat, this.props.lng];
       let body = { location: locArray,
-                    radius: this.props.prefs.radius,
                     type: 'restaurant',
                     maxprice: this.props.prefs.maxprice,
                     rankby: this.props.prefs.rankby, 
-                    keyword: this.props.prefs.keyword
                   }
+      if(this.props.prefs.rankby === "prominence"){
+        body.radius = this.props.prefs.radius;
+      }
+      if(this.props.prefs.keyword !== ""){
+        body.keyword = this.props.prefs.keyword;
+      }
       console.log("search", body)
       fetch("/nearbygo", {
           method: "POST",
@@ -160,49 +164,28 @@ class RestoListGo extends Component {
               }).then(response => response.json())
               })
               let promiseThatResolvesToAnArray = Promise.all(arrayOfPromises)
-              promiseThatResolvesToAnArray.then(arrayOfLocations=> {
-                const restos = arrayOfLocations.map(location => location.resto);
+              promiseThatResolvesToAnArray.then(arrayOfRestos=> {
+                const restos = arrayOfRestos.map(location => location.resto);
 
-                console.log("arrayOfLocations", arrayOfLocations)
+                console.log("arrayOfRestos", restos)
                 this.props.dispatch({
                   type: "set-resto-list",
                   content: restos
                 })
-                this.setState({loaded: true})
+                console.log("setting newSearch to false")
+                this.props.dispatch({
+                  type: "set-search-flg",
+                  content: false
+                });
+                console.log("clearing prefs")
+                this.props.dispatch({
+                  type: "clear-prefs"
+                });
+                if(restos.length > 0){
+                  console.log("setting loaded to true")
+                  this.setState({loaded: true})
+                }
               })
-              // parsedResponse.restos.forEach(function (resto) {
-              //   let detailBody = { placeid: resto.place_id}
-              //   fetch("/detail", {
-              //       method: "POST",
-              //       body: JSON.stringify(detailBody)
-              //   }).then(response => response.text())
-              //     .then(response => {
-              //         let parsedDetail = JSON.parse(response);
-              //         if (parsedDetail.status) {
-              //           console.log("adding to restoList", parsedDetail.resto)
-              //           restoList.push(parsedDetail.resto)
-              //         }
-              //       })
-              //       .then( this.setState({loaded: true}))
-              //       .then( this.props.dispatch({
-              //         type: "set-resto-list",
-              //         content: restoList
-              //       }))
-              //       .catch(err => console.log("ERROR",err));
-              // }, this)
-              console.log("Updating the store")
-              console.log("RetoList", restoList)
-              this.props.dispatch({
-                type: "set-resto-list",
-                content: restoList
-              })
-              this.props.dispatch({
-                type: "set-search-flg",
-                content: false
-              });
-              this.props.dispatch({
-                type: "clear-prefs"
-              });
             }
         })
         .catch(err => console.log("ERROR",err));    
@@ -275,9 +258,25 @@ class RestoListGo extends Component {
       </Card>)
   }
 
+  renderLoading = () => {
+    setTimeout(
+      function() {
+          this.setState({noresults: true});
+      }
+      .bind(this),
+      5000)
+    return <img src="food.gif" alt="Loading" width="400" />  
+  }
+
   renderRestoList = (resto, index) => {
     console.log("resto", resto)
     console.log("resto name", resto.name)
+    let imgSrc;
+    if(resto.photos){
+      imgSrc = `https://maps.googleapis.com/maps/api/place/photo?photoreference=${resto.photos[0].photo_reference}&sensor=false&maxheight=1600&maxwidth=1600&key=AIzaSyBY89bOyBuSZnSkDdebZwUCFFw3jL2gcEI`
+    }else{
+      imgSrc = "logo-small.png"
+    }
     return (
       <div key={resto.place_id} style={Object.assign({}, styles.slide, styles)}> 
         <Card className={this.props.classes.card}>
@@ -298,7 +297,7 @@ class RestoListGo extends Component {
           />
           <CardMedia
                 className={this.props.classes.media}
-                image={`https://maps.googleapis.com/maps/api/place/photo?photoreference=${resto.photos[0].photo_reference}&sensor=false&maxheight=1600&maxwidth=1600&key=AIzaSyBY89bOyBuSZnSkDdebZwUCFFw3jL2gcEI`}
+                image={imgSrc}
                 title={resto.name}
             />
           <CardContent>
@@ -306,8 +305,8 @@ class RestoListGo extends Component {
               {resto.name} 
             </Typography>
             <Typography className={this.props.classes.title} color="textSecondary" gutterBottom>
-              {resto.address_components.formatted_address}
-              {resto.address_components.formatted_phone_number}
+              {resto.formatted_address}<br />
+              {resto.formatted_phone_number}
             </Typography>
             <Typography>
               Price Level: {this.priceSymbols(resto.price_level)}
@@ -365,10 +364,9 @@ class RestoListGo extends Component {
             <br />
             {this.state.openedIndex !== index ? null : <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lng}/>}
             <br />
-            <DialogContentText>Destination: <br /><br />
-                              <b>{resto.name}</b><br />
-                              {resto.address_components.formatted_address}
-                              {resto.address_components.formatted_phone_number}
+            <DialogContentText><b>{resto.name}</b><br />
+                              {resto.formatted_address}<br />
+                              {resto.formatted_phone_number}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -388,14 +386,16 @@ class RestoListGo extends Component {
     const { index } = this.state;
     return (
       <div className="card">
-      {console.log("index", index)}
-      {this.props.restos && this.state.loaded ?
+      {console.log("loaded", this.state.loaded)}
+      {this.state.noresults && !this.state.loaded ?
+        this.renderNoResults() :
+        (this.props.restos.length > 0 && this.state.loaded ?
         <SwipeableViews index={index} onChangeIndex={this.handleChangeIndex}>
-            {console.log("Restos in the store", this.props.restos)}
             {this.props.restos.map(this.renderRestoList)}
             {this.renderEndCard()}
         </SwipeableViews>
-        : this.renderNoResults()}
+        : this.renderLoading())
+        }
       </div>
     );
   }
