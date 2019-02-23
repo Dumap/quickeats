@@ -85,14 +85,18 @@ class Filter extends Component {
         event.preventDefault();
         console.log("handling submit")
         let newPrefs = {
-            radius: this.state.radius,
-            maxprice: this.state.maxprice,
+            radius: parseInt(this.state.radius),
+            maxprice: parseInt(this.state.maxprice),
             rankby: this.state.rankby,
             keyword: this.state.keyword
           }
           this.props.dispatch({
             type: "set-prefs",
             content: newPrefs
+          });
+          this.props.dispatch({
+            type: "set-search-flg",
+            content: true
           });
         console.log("newPrefs", newPrefs)
         this.props.history.push("/golist")

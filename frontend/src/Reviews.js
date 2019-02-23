@@ -12,7 +12,7 @@ componentDidMount = () => {
     console.log("in Reviews")
 
     let body = { placeid: this.props.id}
-    fetch("/detail", {
+    fetch("/reviews", {
         method: "POST",
         body: JSON.stringify(body)
     }).then(response => response.text())

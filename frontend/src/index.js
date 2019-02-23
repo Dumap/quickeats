@@ -11,6 +11,12 @@ let reducer = function(state, action) {
         localStorage.setItem('lat', action.lat);
         localStorage.setItem('lng', action.lng);
         return { ...state, lat: action.lat, lng: action.lng };
+      case "clear-resto-list":
+      localStorage.removeItem('restos');
+        return { ...state, restos: [] };
+      case "add-resto-list":
+        //localStorage.setItem('restos', JSON.stringify(state.restos.concat(action.content)));
+        return { ...state, restos: state.restos.concat(action.content) };
       case "set-resto-list":
         localStorage.setItem('restos', JSON.stringify(action.content));
         return { ...state, restos: action.content };

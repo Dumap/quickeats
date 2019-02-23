@@ -74,7 +74,10 @@ const Title = ({ children }) => <div className="title">{children}</div>;
 class RestoListGo extends Component {
   state = { expanded: false,
             index: 0,
-            open: false };
+            openedIndex: -1,
+            open: false,
+            loaded: false
+          };
 
   handleExpandClick = () => {
     this.setState(state => ({ expanded: !state.expanded }));
@@ -86,17 +89,17 @@ class RestoListGo extends Component {
     });
   };
 
-  handleOpen = () => {
-    this.setState({ open: true });
+  handleOpen = (index) => {
+    this.setState({open: true,  openedIndex: index});
   };
 
   handleClose = () => {
     this.setState({ open: false });
   };
 
-  handleChangeIndex = index => {
+  handleChangeIndex = (index) => {
     this.setState({
-      index,
+      index: index
     });
   };
 
@@ -127,47 +130,156 @@ class RestoListGo extends Component {
       return pricelevel + this.priceSymbols( level - 1 );
     }
   }
+
   componentDidMount = () => {
+    console.log("Is this a new search?", this.props.newSearch)
+    let restoList = []
     if(this.props.newSearch){
-      console.log("in restolist")
+      console.log("in componentDidMount")
       let locArray = [this.props.lat, this.props.lng];
       let body = { location: locArray,
                     radius: this.props.prefs.radius,
                     type: 'restaurant',
-                    maxprice: this.props.prefs.price,
+                    maxprice: this.props.prefs.maxprice,
                     rankby: this.props.prefs.rankby, 
                     keyword: this.props.prefs.keyword
                   }
       console.log("search", body)
       fetch("/nearbygo", {
-        method: "POST",
-        body: JSON.stringify(body)
-      }).then(response => response.text())
+          method: "POST",
+          body: JSON.stringify(body)
+        }).then(response => response.text())
         .then(response => {
-            console.log(response)
-          let parsedResponse = JSON.parse(response);
-          if (parsedResponse.status) {
-            //this.setState({ restos: parsedResponse.restos });
-            this.props.dispatch({
-              type: "set-resto-list",
-              content: parsedResponse.restos
-            });
-            this.props.dispatch({
-              type: "set-search-flg",
-              content: false
-            });
-            this.props.dispatch({
-              type: "clear-prefs"
-            });
-          }
+            let parsedResponse = JSON.parse(response);
+            if (parsedResponse.status) {
+              let arrayOfPromises = parsedResponse.restos.map(resto => {
+                let detailBody = { placeid: resto.place_id}
+                return fetch("/detail", {
+                  method: "POST",
+                  body: JSON.stringify(detailBody)
+              }).then(response => response.json())
+              })
+              let promiseThatResolvesToAnArray = Promise.all(arrayOfPromises)
+              promiseThatResolvesToAnArray.then(arrayOfLocations=> {
+                const restos = arrayOfLocations.map(location => location.resto);
+
+                console.log("arrayOfLocations", arrayOfLocations)
+                this.props.dispatch({
+                  type: "set-resto-list",
+                  content: restos
+                })
+                this.setState({loaded: true})
+              })
+              // parsedResponse.restos.forEach(function (resto) {
+              //   let detailBody = { placeid: resto.place_id}
+              //   fetch("/detail", {
+              //       method: "POST",
+              //       body: JSON.stringify(detailBody)
+              //   }).then(response => response.text())
+              //     .then(response => {
+              //         let parsedDetail = JSON.parse(response);
+              //         if (parsedDetail.status) {
+              //           console.log("adding to restoList", parsedDetail.resto)
+              //           restoList.push(parsedDetail.resto)
+              //         }
+              //       })
+              //       .then( this.setState({loaded: true}))
+              //       .then( this.props.dispatch({
+              //         type: "set-resto-list",
+              //         content: restoList
+              //       }))
+              //       .catch(err => console.log("ERROR",err));
+              // }, this)
+              console.log("Updating the store")
+              console.log("RetoList", restoList)
+              this.props.dispatch({
+                type: "set-resto-list",
+                content: restoList
+              })
+              this.props.dispatch({
+                type: "set-search-flg",
+                content: false
+              });
+              this.props.dispatch({
+                type: "clear-prefs"
+              });
+            }
         })
-        .catch(err => console.log("ERROR",err));
+        .catch(err => console.log("ERROR",err));    
     }
-  };
+  }
+
+  renderEndCard = () => {
+    return(
+      <Card className={this.props.classes.card}>
+        <CardContent>
+        <CardHeader
+            avatar={
+              <Avatar 
+                aria-label="Restaurant"
+                className={this.props.classes.avatar} />
+            }
+            action={
+              <IconButton>
+                <MoreVertIcon />
+              </IconButton>
+            }
+            title={"End of list"} 
+          />
+          <CardMedia
+                className={this.props.classes.media}
+                image="logo-small.png"
+                title="Quickeats"
+            /><br />
+            <Typography variant="h6" component="h3">
+                That's the end of the list! Try adjusting the filter.
+            </Typography>
+        </CardContent>
+        <CardActions className={this.props.classes.actions} disableActionSpacing>
+          <IconButton aria-label="Go back"
+            onClick={this.goBackClick}>
+            <ArrowBackIcon />
+          </IconButton>
+        </CardActions>
+      </Card>)
+  }
+
+  renderNoResults = () => {
+    return(
+      <Card className={this.props.classes.card}>
+      <CardContent>
+      <CardHeader
+          avatar={
+            <Avatar 
+              aria-label="Restaurant"
+              className={this.props.classes.avatar} />
+          }
+          action={
+            <IconButton>
+              <MoreVertIcon />
+            </IconButton>
+          }
+          title={"No Results"} 
+        />
+        <CardMedia
+              className={this.props.classes.media}
+              image="logo-small.png"
+              title="Quickeats"
+          /><br />
+          <Typography variant="h6" component="h3">
+              Sorry, No Results! Try adjusting the filter.
+          </Typography>
+      </CardContent>
+      <CardActions className={this.props.classes.actions} disableActionSpacing>
+      </CardActions>
+      </Card>)
+  }
+
   renderRestoList = (resto, index) => {
-    console.log("Resto name", resto.name)
+    console.log("resto", resto)
+    console.log("resto name", resto.name)
     return (
-      <div key={resto.id} style={Object.assign({}, styles.slide, styles)}> 
+      <div key={resto.place_id} style={Object.assign({}, styles.slide, styles)}> 
         <Card className={this.props.classes.card}>
           <CardHeader
             avatar={
@@ -184,7 +296,6 @@ class RestoListGo extends Component {
             title={resto.name} 
             subheader={resto.hasOwnProperty("opening_hours") ? resto.opening_hours.open_now ? "Open Now" : "Closed" : ""}
           />
-
           <CardMedia
                 className={this.props.classes.media}
                 image={`https://maps.googleapis.com/maps/api/place/photo?photoreference=${resto.photos[0].photo_reference}&sensor=false&maxheight=1600&maxwidth=1600&key=AIzaSyBY89bOyBuSZnSkDdebZwUCFFw3jL2gcEI`}
@@ -195,7 +306,8 @@ class RestoListGo extends Component {
               {resto.name} 
             </Typography>
             <Typography className={this.props.classes.title} color="textSecondary" gutterBottom>
-              {resto.vicinity}
+              {resto.address_components.formatted_address}
+              {resto.address_components.formatted_phone_number}
             </Typography>
             <Typography>
               Price Level: {this.priceSymbols(resto.price_level)}
@@ -220,7 +332,7 @@ class RestoListGo extends Component {
             onClick={this.goForwardClick}>
             <ArrowForwardIcon />
           </IconButton>
-          <IconButton aria-label="Map" onClick={this.handleOpen}>
+          <IconButton aria-label="Map" onClick={() => this.handleOpen(index)}>
             <Avatar 
                   aria-label="Map" 
                   src="google-maps.png"
@@ -251,11 +363,12 @@ class RestoListGo extends Component {
           <DialogTitle className={this.props.classes.dark} id="responsive-dialog-title"><Title>{"How do you get there"}</Title></DialogTitle>
           <DialogContent>
             <br />
-            <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lng}/>
+            {this.state.openedIndex !== index ? null : <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lng}/>}
             <br />
             <DialogContentText>Destination: <br /><br />
                               <b>{resto.name}</b><br />
-                              {resto.vicinity}
+                              {resto.address_components.formatted_address}
+                              {resto.address_components.formatted_phone_number}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -273,14 +386,16 @@ class RestoListGo extends Component {
   };
   render() {
     const { index } = this.state;
-    console.log("Hello")
     return (
       <div className="card">
+      {console.log("index", index)}
+      {this.props.restos && this.state.loaded ?
         <SwipeableViews index={index} onChangeIndex={this.handleChangeIndex}>
-          {this.props.restos
-            ? this.props.restos.map(this.renderRestoList)
-            : "loading restorants"}  
+            {console.log("Restos in the store", this.props.restos)}
+            {this.props.restos.map(this.renderRestoList)}
+            {this.renderEndCard()}
         </SwipeableViews>
+        : this.renderNoResults()}
       </div>
     );
   }

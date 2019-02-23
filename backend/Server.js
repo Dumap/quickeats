@@ -37,6 +37,24 @@ app.post("/detail", function(req, res) {
       //res.send(response.json.result)
       console.log("Result:",response.json.result)
       let reply = {status: true,
+          resto: response.json.result}
+      res.send(JSON.stringify(reply))
+    })
+    .catch((err) => {
+      res.send(err)
+      console.log(err)
+    });
+})
+
+app.post("/reviews", function(req, res) {
+  console.log("in reviews")
+    let params = JSON.parse(req.body);
+    console.log("Place ID:", params)
+    googleMapsClient.place(params).asPromise()
+    .then((response) => {
+      //res.send(response.json.result)
+      console.log("Result:",response.json.result)
+      let reply = {status: true,
           reviews: response.json.result.reviews}
       res.send(JSON.stringify(reply))
     })

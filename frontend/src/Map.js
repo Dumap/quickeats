@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import {withScriptjs, withGoogleMap, GoogleMap, DirectionsRenderer} from 'react-google-maps'
 
 class Map extends Component {
-
+  
       render() {
         console.log("your cors 1:", this.props.lat + " - " + this.props.lng)
         console.log("dest cors 1:", this.props.rlat + " - " + this.props.rlng)
