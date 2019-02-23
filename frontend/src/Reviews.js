@@ -28,7 +28,7 @@ componentDidMount = () => {
   renderReviews = (review, index) => {
       console.log("index", index)
     return(
-        <CardContent>
+        <div key={review.author_name}>
             <CardHeader
             avatar={
               <Avatar 
@@ -37,7 +37,7 @@ componentDidMount = () => {
             }
             title={review.author_name} 
           />
-            <Typography paragraph>
+            <Typography variant="subheading" gutterBottom>
             <StarRatings
                         rating={review.rating}
                         starRatedColor="red"
@@ -50,7 +50,7 @@ componentDidMount = () => {
             <Typography paragraph>
                 {review.text}
             </Typography>
-        </CardContent>
+        </div>
     )
   }  
   render() {

@@ -18,7 +18,6 @@ import red from '@material-ui/core/colors/red';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import MoreVertIcon from '@material-ui/icons/MoreVert';
 import StarRatings from 'react-star-ratings';
 import Reviews from './Reviews';
 import Map from './Map';
@@ -27,6 +26,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Tooltip from '@material-ui/core/Tooltip';
 import withMobileDialog from '@material-ui/core/withMobileDialog';
 import { compose } from "recompose";
 
@@ -34,11 +34,11 @@ import { compose } from "recompose";
 const styles = theme => ({
   slide: {
     padding: 15,
-    minHeight: 300,
+    minHeight: 380,
     color: '#fff',
   },
   card: {
-    //maxWidth: 600,
+    minWidth: 350,
     margin: 10
   },
   media: {
@@ -75,13 +75,14 @@ class RestoListGo extends Component {
   state = { expanded: false,
             index: 0,
             openedIndex: -1,
+            expandIndex: -1,
             open: false,
             loaded: false,
             noresults: false
           };
 
-  handleExpandClick = () => {
-    this.setState(state => ({ expanded: !state.expanded }));
+  handleExpandClick = (index) => {
+    this.setState(state => ({ expanded: !state.expanded, expandIndex: index }));
   };
 
   handleChange = (event, value) => {
@@ -104,8 +105,11 @@ class RestoListGo extends Component {
     });
   };
 
-  goBackClick = () => {
+  goBackClick = (index) => {
     console.log("going back")
+    if(this.state.expanded){
+      this.handleExpandClick(index)
+    }
     if (this.state.index > 0){
       this.setState({
         index: this.state.index -1,
@@ -113,11 +117,14 @@ class RestoListGo extends Component {
     }
   }
   
-  goForwardClick = () => {
+  goForwardClick = (index) => {
     console.log("going forward")
-    if (this.state.index < 20){
+    if(this.state.expanded){
+      this.handleExpandClick(index)
+    }
+    if (index < 20){
       this.setState({
-        index: this.state.index +1,
+        index: index +1,
       });
     }
   }
@@ -161,7 +168,7 @@ class RestoListGo extends Component {
                 return fetch("/detail", {
                   method: "POST",
                   body: JSON.stringify(detailBody)
-              }).then(response => response.json())
+                }).then(response => response.json())
               })
               let promiseThatResolvesToAnArray = Promise.all(arrayOfPromises)
               promiseThatResolvesToAnArray.then(arrayOfRestos=> {
@@ -202,11 +209,6 @@ class RestoListGo extends Component {
                 aria-label="Restaurant"
                 className={this.props.classes.avatar} />
             }
-            action={
-              <IconButton>
-                <MoreVertIcon />
-              </IconButton>
-            }
             title={"End of list"} 
           />
           <CardMedia
@@ -215,7 +217,7 @@ class RestoListGo extends Component {
                 title="Quickeats"
             /><br />
             <Typography variant="h6" component="h3">
-                That's the end of the list! Try adjusting the filter.
+                That's the end of the list! <br />Try adjusting the filter.
             </Typography>
         </CardContent>
         <CardActions className={this.props.classes.actions} disableActionSpacing>
@@ -237,11 +239,6 @@ class RestoListGo extends Component {
               aria-label="Restaurant"
               className={this.props.classes.avatar} />
           }
-          action={
-            <IconButton>
-              <MoreVertIcon />
-            </IconButton>
-          }
           title={"No Results"} 
         />
         <CardMedia
@@ -250,7 +247,7 @@ class RestoListGo extends Component {
               title="Quickeats"
           /><br />
           <Typography variant="h6" component="h3">
-              Sorry, No Results! Try adjusting the filter.
+              Sorry, No Results! <br />Try adjusting the filter.
           </Typography>
       </CardContent>
       <CardActions className={this.props.classes.actions} disableActionSpacing>
@@ -265,7 +262,7 @@ class RestoListGo extends Component {
       }
       .bind(this),
       5000)
-    return <img src="food.gif" alt="Loading" width="400" />  
+    return <img src="food.gif" alt="Loading" width="380" />  
   }
 
   renderRestoList = (resto, index) => {
@@ -286,11 +283,6 @@ class RestoListGo extends Component {
                 aria-label="Restaurant" 
                 src={resto.icon}
                 className={this.props.classes.avatar} />
-            }
-            action={
-              <IconButton>
-                <MoreVertIcon />
-              </IconButton>
             }
             title={resto.name} 
             subheader={resto.hasOwnProperty("opening_hours") ? resto.opening_hours.open_now ? "Open Now" : "Closed" : ""}
@@ -324,45 +316,54 @@ class RestoListGo extends Component {
           </CardContent>
           <CardActions className={this.props.classes.actions} disableActionSpacing>
           <IconButton aria-label="Go back"
-            onClick={this.goBackClick}>
+            onClick={() => this.goBackClick(index)}>
             <ArrowBackIcon />
           </IconButton>
           <IconButton aria-label="Next"
-            onClick={this.goForwardClick}>
+            onClick={() => this.goForwardClick(index)}>
             <ArrowForwardIcon />
           </IconButton>
-          <IconButton aria-label="Map" onClick={() => this.handleOpen(index)}>
-            <Avatar 
-                  aria-label="Map" 
-                  src="google-maps.png"
-                  className={this.props.classes.bigAvatar}
-             />
-          </IconButton>
+          <Tooltip title="Get directions">
+            <IconButton aria-label="Map" onClick={() => this.handleOpen(index)}>
+              <Avatar 
+                    aria-label="Map" 
+                    src="google-maps.png"
+                    className={this.props.classes.bigAvatar}
+              />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Show more">
           <IconButton
             className={classnames(this.props.classes.expand, {
               [this.props.classes.expandOpen]: this.state.expanded,
             })}
-            onClick={this.handleExpandClick}
+            onClick={() => this.handleExpandClick(index)}
             aria-expanded={this.state.expanded}
             aria-label="Show more"
           >
             <ExpandMoreIcon />
           </IconButton>
+          </Tooltip>
         </CardActions>
-        <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
-          <Reviews id={resto.place_id}/>
+        <Collapse in={this.state.expanded && this.state.expandIndex === index} timeout="auto" unmountOnExit>
+          <CardContent>
+            <Typography variant="subheading" gutterBottom>Opening hours:</Typography><br />
+            {!resto.opening_hours ? null : resto.opening_hours.weekday_text.map((day) => {return(<Typography key={day} variant="caption" color="textSecondary" gutterBottom>{day}</Typography>)})}
+            <br /><Typography variant="subheading" gutterBottom>Reviews:</Typography>
+            <Reviews id={resto.place_id}/>
+          </CardContent>
         </Collapse>
         </Card>
         <Dialog
           fullScreen={this.props.fullScreen}
-          open={this.state.open}
+          open={this.state.open && this.state.openedIndex === index}
           onClose={this.handleClose}
           aria-labelledby="responsive-dialog-title"
           >
           <DialogTitle className={this.props.classes.dark} id="responsive-dialog-title"><Title>{"How do you get there"}</Title></DialogTitle>
           <DialogContent>
             <br />
-            {this.state.openedIndex !== index ? null : <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lng}/>}
+            {this.state.openedIndex !== index ? "Not available" : <Map rlat={resto.geometry.location.lat} rlng={resto.geometry.location.lng}/>}
             <br />
             <DialogContentText><b>{resto.name}</b><br />
                               {resto.formatted_address}<br />
@@ -389,7 +390,7 @@ class RestoListGo extends Component {
       {console.log("loaded", this.state.loaded)}
       {this.state.noresults && !this.state.loaded ?
         this.renderNoResults() :
-        (this.props.restos.length > 0 && this.state.loaded ?
+        ( this.props.restos && this.props.restos.length > 0 && this.state.loaded ?
         <SwipeableViews index={index} onChangeIndex={this.handleChangeIndex}>
             {this.props.restos.map(this.renderRestoList)}
             {this.renderEndCard()}
@@ -418,5 +419,5 @@ RestoListGo.propTypes = {
 
 let connectRestoListGo = connect(mapStateToProps)(RestoListGo);
 
-export default  compose(withStyles(styles))(withMobileDialog()(connectRestoListGo));
+export default  compose(withStyles(styles))(withMobileDialog({breakpoint: 'md'})(connectRestoListGo));
 
