@@ -18,6 +18,7 @@ import red from '@material-ui/core/colors/red';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import LinkIcon from '@material-ui/icons/Link';
 import StarRatings from 'react-star-ratings';
 import Reviews from './Reviews';
 import Map from './Map';
@@ -147,6 +148,10 @@ class RestoListGo extends Component {
   }
 
   getDistance = (p1, p2) => {
+    console.log("p1 lat", p1.lat)
+    console.log("p1 lng", p1.lng)
+    console.log("p2 lat", p2.lat)
+    console.log("p2 lng", p2.lng)
     var R = 6378137; // Earth’s mean radius in meter
     var dLat = this.rad(p2.lat - p1.lat);
     var dLong = this.rad(p2.lng - p1.lng);
@@ -155,7 +160,7 @@ class RestoListGo extends Component {
       Math.sin(dLong / 2) * Math.sin(dLong / 2);
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     var d = R * c;
-    return d; // returns the distance in meter
+    return Math.round(d); // returns the distance in meter
   }
 
   componentDidMount = () => {
@@ -287,8 +292,8 @@ class RestoListGo extends Component {
   renderRestoList = (resto, index) => {
     console.log("resto", resto)
     console.log("resto name", resto.name)
-    let p1 =  { lat: parseInt(this.props.lat), lng: parseInt(this.props.lng)}
-    let p2 =  { lat: parseInt(resto.geometry.location.lat), lng: parseInt(resto.geometry.location.lng)}
+    let p1 =  { lat: this.props.lat, lng: this.props.lng}
+    let p2 =  { lat: resto.geometry.location.lat, lng: resto.geometry.location.lng}
     let distance = this.getDistance(p1, p2)
     let imgSrc;
     if(resto.photos){
@@ -344,7 +349,18 @@ class RestoListGo extends Component {
           <IconButton aria-label="Next"
             onClick={() => this.goForwardClick(index)}>
             <ArrowForwardIcon />
-          </IconButton>
+          </IconButton>&nbsp;&nbsp;&nbsp;&nbsp;
+          <Tooltip title="Website">
+            <IconButton aria-label="website">
+              <a
+                target="_blank" 
+                rel="noopener noreferrer"
+                href={resto.website}
+              >
+                <LinkIcon />
+              </a>
+            </IconButton>
+          </Tooltip>&nbsp;&nbsp;
           <Tooltip title="Get directions">
             <IconButton aria-label="Map" onClick={() => this.handleOpen(index)}>
               <Avatar 
@@ -450,4 +466,3 @@ RestoListGo.propTypes = {
 let connectRestoListGo = connect(mapStateToProps)(RestoListGo);
 
 export default  compose(withStyles(styles))(withMobileDialog({breakpoint: 'md'})(connectRestoListGo));
-
