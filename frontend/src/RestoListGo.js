@@ -104,6 +104,9 @@ class RestoListGo extends Component {
   };
 
   handleChangeIndex = (index) => {
+    if(this.state.expanded){
+      this.handleExpandClick(this.state.index)
+    }
     this.setState({
       index: index
     });
