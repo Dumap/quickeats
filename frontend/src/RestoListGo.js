@@ -151,10 +151,6 @@ class RestoListGo extends Component {
   }
 
   getDistance = (p1, p2) => {
-    console.log("p1 lat", p1.lat)
-    console.log("p1 lng", p1.lng)
-    console.log("p2 lat", p2.lat)
-    console.log("p2 lng", p2.lng)
     var R = 6378137; // Earth’s mean radius in meter
     var dLat = this.rad(p2.lat - p1.lat);
     var dLong = this.rad(p2.lng - p1.lng);
@@ -183,7 +179,7 @@ class RestoListGo extends Component {
         body.keyword = this.props.prefs.keyword;
       }
       console.log("search", body)
-      fetch("/nearbygo", {
+      fetch("/nearby", {
           method: "POST",
           body: JSON.stringify(body)
         }).then(response => response.text())

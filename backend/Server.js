@@ -11,7 +11,7 @@ let app = express()
 app.use(cors())
 app.use(bodyParser.raw({ type: "*/*" }))
 
-app.post("/nearbygo", function(req, res) {
+app.post("/nearby", function(req, res) {
   console.log("in google nearby")
     let params = JSON.parse(req.body);
     console.log("params", params)
