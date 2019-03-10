@@ -1,5 +1,5 @@
 const googleMapsClient = require('@google/maps').createClient({
-  key: 'AIzaSyBY89bOyBuSZnSkDdebZwUCFFw3jL2gcEI',  // server key
+  key: YOUR_API_KEY,  // server key
   rate: {limit: 50},
   Promise: Promise // 'Promise' is the native constructor.
 });
