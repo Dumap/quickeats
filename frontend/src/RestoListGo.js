@@ -32,7 +32,7 @@ import withMobileDialog from '@material-ui/core/withMobileDialog';
 import { compose } from "recompose";
 
 //const apiKey = process.env.REACT_APP_API_KEY
-const apiKey = "AIzaSyAG8-zlUDe9RBGIPhO6BErIzH7qznXFkg8"
+const apiKey = YOUR_API_KEY
 console.log("API KEY", apiKey)
 
 const styles = theme => ({
