@@ -6,7 +6,7 @@ import { connect } from "react-redux";
 import {withScriptjs, withGoogleMap, GoogleMap, DirectionsRenderer} from 'react-google-maps'
 
 //const apiKey = process.env.API_KEY
-const apiKey = "AIzaSyAG8-zlUDe9RBGIPhO6BErIzH7qznXFkg8"
+const apiKey = YOUR_API_KEY
 
 class Map extends Component {
   
