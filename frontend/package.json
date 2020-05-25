@@ -7,7 +7,7 @@
     "@material-ui/icons": "^3.0.2",
     "compose": "^0.1.2",
     "dotenv": "^6.2.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "react": "^16.8.2",
     "react-compose": "^2.0.0",
     "react-dom": "^16.8.2",
